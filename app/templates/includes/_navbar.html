@@ -1,0 +1,28 @@
+<nav class="navbar navbar-dark navbar-expand-sm bg-dark fixed-top">
+      
+        <ul class="navbar-nav">
+          <li class="nav-item ">
+            <a class="nav-link " href="/">Home </a>
+          </li>
+          {% if not session.logged_in %}
+          <li class="nav-item "><a class="nav-link " href="/login">Login</a></li>
+          {% endif %}
+
+          {% if session.logged_in %}
+          {% if session.profile == 1 %}
+          <li class="nav-item "><a class="nav-link " href="/adminDashboard">Dashboard</a></li>
+          {% else %}
+            {% if session.profile == 2 %}
+              <li class="nav-item "><a class="nav-link " href="/trainerDashboard">Dashboard</a></li>
+            {% else %}
+              {% if session.profile == 3 %}
+                <li class="nav-item "><a class="nav-link " href="/trainerDashboard">Dashboard</a></li>
+              {% else %}
+                <li class="nav-item "><a class="nav-link " href="{{url_for('memberDashboard', username = session.username)}}">Dashboard</a></li>
+              {% endif %}
+            {% endif %}
+          {% endif %}
+          <li class="nav-item "><a class="nav-link " href="/logout">Logout</a></li>
+          {% endif %}
+        </ul>
+    </nav>
