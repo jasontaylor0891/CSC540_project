@@ -1,13 +1,19 @@
 from flask import Flask, render_template, flash, redirect, url_for, request, session, logging
 from flask_mysqldb import MySQL
 from passlib.hash import sha256_crypt
-from flask_wtf import Form
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators, RadioField, SelectField, IntegerField
+from flask_wtf import FlaskForm
+from wtforms import Form, StringField, BooleanField, TextAreaField, PasswordField, validators, RadioField, SelectField, IntegerField, SubmitField
+from wtforms.validators import DataRequired, Length, Email, EqualTo
+
+#from flask_wtf import Form
+#from wtforms import Form, StringField, TextAreaField, PasswordField, validators, RadioField, SelectField, IntegerField
+#from wtforms.validators import Required
 #from wtforms.fields.html5 import DateField
 #from flask_script import Manager
+
 from functools import wraps
 from datetime import datetime
-
+#from forms import AddMemberForm
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "welcome123"
@@ -141,10 +147,86 @@ def logout():
 	flash('You are now logged out', 'success')
 	return redirect(url_for('login'))
 
+userAge = []
+userGender = []
+menberType = []
+values = []
+
+class AddMemberForm(Form):
+
+    address = StringField('Address', [validators.Length(min=1, max=75), validators.InputRequired()])
+    city = StringField('City', [validators.Length(min=1, max=25), validators.InputRequired()])
+    zipCode = StringField('Zip Code', [validators.Length(min=1, max=75), validators.InputRequired()])
+    fname = StringField('First Name', [validators.Length(min=1, max=50), validators.InputRequired()])
+    lname = StringField('Last Name', [validators.Length(min=1, max=50), validators.InputRequired()])
+    username = StringField('Username', [validators.InputRequired(), validators.NoneOf(values = values, message = "Username is already taken")])
+    password = PasswordField('Password', [
+        validators.DataRequired(),
+        validators.EqualTo('confirm', message='Passwords do not match')])
+    confirm = PasswordField('Confirm Password')
+    age = SelectField('Age', choices = userAge)
+    gender = SelectField('Gender', choices = userGender)
+    mtype = SelectField('Membership Type', choices = menberType)
+
 @app.route('/registration', methods = ['GET', 'POST'])
-@is_logged_in
+#@is_logged_in
 def registration():
-    return render_template('registration.html')
+
+	menberType.clear()
+	userGender.clear()
+	userAge.clear()
+	values.clear()
+
+	x = range(16, 100)
+	for i in x:
+	    userAge.append(i)
+
+	userGender.append("Male")
+	userGender.append("Female")
+	userGender.append("Other")
+	
+	cur = mysql.connection.cursor()
+	q = cur.execute("SELECT membershipsTypesName from membershipsTypes")
+	b = cur.fetchall()
+	for i in range(q):
+	    menberType.append(b[i]['membershipsTypesName'])
+
+	q = cur.execute("SELECT username FROM logins")
+	b = cur.fetchall()
+	for i in range(q):
+	    values.append(b[i]['username'])
+
+	form = AddMemberForm(request.form)
+	if request.method == 'POST':
+		username = request.form['username']
+		fname = request.form['fname']
+		lname = request.form['lname']
+		password = request.form['password']
+		age = request.form['age']
+		gender = request.form['gender']
+		mtype = request.form['mtype']
+		address = request.form['address']
+		city = request.form['city']
+		zipCode = request.form['zipCode']
+
+		if mtype == 'Platinum':
+			mtypeId = 1
+		if mtype == 'Gold':
+			mtypeId = 2
+		if mtype == 'Sliver':
+			mtypeId = 3
+
+		result = cur.execute('SELECT fee from membershipsTypes WHERE membershipsTypesName = %s', [mtype])
+		data = cur.fetchone()
+        
+		mfee = data['fee']	
+		#cur.execute("INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee) VALUES(%s, %s, %s, %s, %s, %s, %s)", (name, username, password, street, city, 3,phone))
+		flash(f'Account created for {mfee}!', 'success')
+		#flash(f'Account created for {username}!', 'success')
+		#flash('You are now logged out', 'success')
+		cur.close()
+
+	return render_template('registration.html', title='Register', form=form)
 
 #if __name__ == "__main__":
 app.run(host="0.0.0.0", port=int("5000"), debug=True)
