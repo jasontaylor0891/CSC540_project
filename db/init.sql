@@ -18,29 +18,39 @@ VALUES
 (2, 'Gold', 49.95),
 (3, 'Sliver', 25.00);
 
+
 CREATE TABLE logins(
     username VARCHAR(200), 
     password VARCHAR(500), 
-    name VARCHAR(100), 
     profile INT, 
     PRIMARY KEY(username));
 
-INSERT INTO logins(username, password, name, profile) 
+INSERT INTO logins(username, password, profile) 
 VALUES
-('admin', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 'Joe Blow', 1),
-('t1', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 'Meg Gray', 3),
-('r1', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 'Mat Armstrong', 2),
-('m1', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 'Jill Dow', 4),
-('m2', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 'Kate Hope', 4);
+('admin', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 1),
+('t1', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 3),
+('r1', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 2),
+('jillt', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 4),
+('billw', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 4);
+
 
 
 CREATE TABLE Branch(
     branch_No INT PRIMARY KEY AUTO_INCREMENT,
-    address VARCHAR(60) NOT NULL
+    branch_Name  VARCHAR(25) NOT NULL,
+    address VARCHAR(60) NOT NULL, 
+    city VARCHAR(25) NOT NULL,
+    zipCode VARCHAR(5) NOT NULL
 );
 
+INSERT INTO Branch(branch_Name, address, city, zipCode) 
+VALUES 
+('Power Fitness New Haven', '142 Church St', 'New Haven', '06501'),
+('Power Fitness Milford', '1258 Boston Post Rd', 'Milford', '06460'),
+('Power Fitness Stamford', '142 Church St', 'New Haven', '06901');
+
 CREATE TABLE Customers(
-    customer_ID INT NOT NULL AUTO_INCREMENT,
+    customer_ID INT PRIMARY KEY AUTO_INCREMENT,
     firstName VARCHAR(30) NOT NULL,
     lastName VARCHAR(30) NOT NULL,
     age INT NOT NULL,
@@ -53,8 +63,10 @@ CREATE TABLE Customers(
     fee FLOAT NOT NULL,
     username VARCHAR(30) NOT NULL,
     password VARCHAR(250) NOT NULL,
-    PRIMARY KEY ( customer_ID )
+    FOREIGN KEY (username) REFERENCES logins(username)
 );
+INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username, password) VALUES( 'Jill', 'Taylor', 32, 'Female', '21 Chidsey Dr', 'Northford', '06471', 1, 'Platinum', 99.95, 'jillt', 'welcome123');
+INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username, password) VALUES( 'Bill', 'West', 28, 'Male', '883 Elm St', 'New Haven', '06501', 1, 'Platinum', 99.95, 'billw', 'welcome123');
 
 CREATE TABLE Employees(
     employee_ID INT PRIMARY KEY AUTO_INCREMENT,
