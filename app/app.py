@@ -154,6 +154,7 @@ values = []
 
 class AddMemberForm(Form):
 
+	#Class to define the Add Member Form
     address = StringField('Address', [validators.Length(min=1, max=75), validators.InputRequired()])
     city = StringField('City', [validators.Length(min=1, max=25), validators.InputRequired()])
     zipCode = StringField('Zip Code', [validators.Length(min=1, max=75), validators.InputRequired()])
@@ -172,25 +173,30 @@ class AddMemberForm(Form):
 #@is_logged_in
 def registration():
 
+	#Clear the lists
 	menberType.clear()
 	userGender.clear()
 	userAge.clear()
 	values.clear()
 
+	#Create the list for the age SelectField
 	x = range(16, 100)
 	for i in x:
 	    userAge.append(i)
 
+	#Create the list for the gender list
 	userGender.append("Male")
 	userGender.append("Female")
 	userGender.append("Other")
 	
+	#Create the list for the membership types
 	cur = mysql.connection.cursor()
 	q = cur.execute("SELECT membershipsTypesName from membershipsTypes")
 	b = cur.fetchall()
 	for i in range(q):
 	    menberType.append(b[i]['membershipsTypesName'])
 
+	#Create the list of usersnames
 	q = cur.execute("SELECT username FROM logins")
 	b = cur.fetchall()
 	for i in range(q):
@@ -198,6 +204,8 @@ def registration():
 
 	form = AddMemberForm(request.form)
 	if request.method == 'POST':
+
+		#Get the data from the form
 		username = request.form['username']
 		fname = request.form['fname']
 		lname = request.form['lname']
@@ -209,6 +217,7 @@ def registration():
 		city = request.form['city']
 		zipCode = request.form['zipCode']
 
+		#Get membership_id from user slection
 		if mtype == 'Platinum':
 			mtypeId = 1
 		if mtype == 'Gold':
@@ -216,14 +225,25 @@ def registration():
 		if mtype == 'Sliver':
 			mtypeId = 3
 
+		#Get membership fee from user slection
 		result = cur.execute('SELECT fee from membershipsTypes WHERE membershipsTypesName = %s', [mtype])
 		data = cur.fetchone()
-        
 		mfee = data['fee']	
-		#cur.execute("INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee) VALUES(%s, %s, %s, %s, %s, %s, %s)", (name, username, password, street, city, 3,phone))
-		flash(f'Account created for {mfee}!', 'success')
-		#flash(f'Account created for {username}!', 'success')
-		#flash('You are now logged out', 'success')
+		
+		#Update logins table
+		hash = sha256_crypt.hash(password)
+		sql = "INSERT INTO logins(username, password, profile) VALUES('" +username+ "', '" +hash+ "', 4)"
+		cur.execute(sql)
+		mysql.connection.commit()
+
+		#Update Customers Table
+		sql = "INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username, password) VALUES( '" +fname+ "', '" +lname+ "', " +str(age)+", '" +gender+"', '"+address+"', '"+city+"', '" +zipCode+"', " +str(mtypeId)+", '"+mtype+"', "+str(mfee)+", '"+username+"', '"+password+"')"
+		cur.execute(sql)
+		mysql.connection.commit()
+	
+		flash(f'Account created for {username}!', 'success')
+		#flash(f"{sql}", 'success')
+
 		cur.close()
 
 	return render_template('registration.html', title='Register', form=form)
