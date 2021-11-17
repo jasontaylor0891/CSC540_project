@@ -28,8 +28,9 @@ CREATE TABLE logins(
 INSERT INTO logins(username, password, profile) 
 VALUES
 ('admin', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 1),
-('t1', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 3),
-('r1', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 2),
+('jmosher', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 1),
+('ehope', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 3),
+('jkelly', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 2),
 ('jillt', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 4),
 ('billw', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 4);
 
@@ -40,14 +41,15 @@ CREATE TABLE Branch(
     branch_Name  VARCHAR(25) NOT NULL,
     address VARCHAR(60) NOT NULL, 
     city VARCHAR(25) NOT NULL,
-    zipCode VARCHAR(5) NOT NULL
+    zipCode VARCHAR(5) NOT NULL,
+    phoneNum VARCHAR(12) NOT NULL
 );
 
-INSERT INTO Branch(branch_Name, address, city, zipCode) 
+INSERT INTO Branch(branch_Name, address, city, zipCode, phoneNum) 
 VALUES 
-('Power Fitness New Haven', '142 Church St', 'New Haven', '06501'),
-('Power Fitness Milford', '1258 Boston Post Rd', 'Milford', '06460'),
-('Power Fitness Stamford', '142 Church St', 'New Haven', '06901');
+('Power Fitness New Haven', '142 Church St', 'New Haven', '06501', '203-555-1234'),
+('Power Fitness Milford', '1258 Boston Post Rd', 'Milford', '06460', '203-555-1234'),
+('Power Fitness Stamford', '142 Church St', 'Stamford', '06901', '203-555-1234');
 
 CREATE TABLE Customers(
     customer_ID INT PRIMARY KEY AUTO_INCREMENT,
@@ -61,22 +63,29 @@ CREATE TABLE Customers(
     membership_ID INT NOT NULL,
     membership_type VARCHAR(10) NOT NULL,
     fee FLOAT NOT NULL,
+    branch_No INT NOT NULL,
     username VARCHAR(30) NOT NULL,
-    password VARCHAR(250) NOT NULL,
-    FOREIGN KEY (username) REFERENCES logins(username)
+    FOREIGN KEY (username) REFERENCES logins(username),
+    FOREIGN KEY (branch_No) REFERENCES Branch(branch_No)
 );
-INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username, password) VALUES( 'Jill', 'Taylor', 32, 'Female', '21 Chidsey Dr', 'Northford', '06471', 1, 'Platinum', 99.95, 'jillt', 'welcome123');
-INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username, password) VALUES( 'Bill', 'West', 28, 'Male', '883 Elm St', 'New Haven', '06501', 1, 'Platinum', 99.95, 'billw', 'welcome123');
+INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username, branch_No) VALUES( 'Jill', 'Taylor', 32, 'Female', '21 Chidsey Dr', 'Northford', '06471', 1, 'Platinum', 99.95, 'jillt', 1);
+INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username, branch_No) VALUES( 'Bill', 'West', 28, 'Male', '883 Elm St', 'New Haven', '06501', 1, 'Platinum', 99.95, 'billw', 3);
 
 CREATE TABLE Employees(
     employee_ID INT PRIMARY KEY AUTO_INCREMENT,
     firstName VARCHAR(255),
     lastName VARCHAR(255) NOT NULL,
-    branch_No INT,
+    branch_No INT NOT NULL,
     position VARCHAR(30),
     salary INT,
+    username VARCHAR(30) NOT NULL,
+    FOREIGN KEY (username) REFERENCES logins(username),
     FOREIGN KEY (branch_No) REFERENCES Branch(branch_No)
 );
+
+INSERT INTO Employees(firstName, lastName, branch_No, position, salary, username) VALUES( 'Jake', 'Mosher', 1, 'Manager', '89000', 'jmosher');
+INSERT INTO Employees(firstName, lastName, branch_No, position, salary, username) VALUES( 'emily', 'hope', 1, 'Trainer', '48500', 'ehope');
+INSERT INTO Employees(firstName, lastName, branch_No, position, salary, username) VALUES( 'John', 'Kelly', 1, 'Receptionist', '43000', 'jkelly');
 
 CREATE TABLE Classes(
     class_ID INT PRIMARY KEY AUTO_INCREMENT,
