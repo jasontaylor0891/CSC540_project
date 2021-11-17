@@ -2,7 +2,7 @@ from flask import Flask, render_template, flash, redirect, url_for, request, ses
 from flask_mysqldb import MySQL
 from passlib.hash import sha256_crypt
 from flask_wtf import FlaskForm
-from wtforms import Form, StringField, BooleanField, TextAreaField, PasswordField, validators, RadioField, SelectField, IntegerField, SubmitField
+from wtforms import Form, StringField, BooleanField, TextAreaField, PasswordField, validators, RadioField, SelectField, IntegerField, SubmitField, DateField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 
 #from flask_wtf import Form
@@ -19,7 +19,7 @@ app = Flask(__name__, template_folder='templates')
 app.secret_key = "welcome123"
 
 #Change mysql host if not using docker. Docker default is gym_managment_db_1
-app.config['MYSQL_HOST'] = 'gym_managment_db_1'
+app.config['MYSQL_HOST'] = 'csc540_project-db-1'
 app.config['MYSQL_USER'] = 'gym'
 app.config['MYSQL_PASSWORD'] = 'welcome123'
 app.config['MYSQL_DB'] = 'gym'
@@ -281,7 +281,7 @@ def addEmployee():
 	for i in range(q):
 	    epmBranch.append(b[i]['branch_Name'])
 	
-	#Create the list for the gender list
+	#Create the list for the position list
 	empPosition.append("Manager")
 	empPosition.append("Trainer")
 	empPosition.append("Receptionist")
@@ -322,7 +322,53 @@ def addEmployee():
 		mysql.connection.commit()
 		#flash(f"{sql}", 'success')
 
-	return render_template("addEmployee.html", title='Add Employee', form=form); 
+	return render_template("addEmployee.html", title='Add Employee', form=form);	
+
+eqBranch = []	
+
+class AddEquipmentForm(Form):	
+
+	#Class to define the Add Equipment Form
+    etype = StringField('Equipment Type', [validators.Length(min=1, max=50), validators.InputRequired()])
+    desc = TextAreaField('Description', [validators.Length(min=1, max=50), validators.InputRequired()])
+    datePur = DateField('Date Purchased', [validators.InputRequired()], format = '%m/%d/%Y')  
+    branch = SelectField('Branch', choices = eqBranch) 
+
+@app.route('/addEquipment', methods = ['GET', 'POST'])
+#@is_logged_in
+#@is_admin
+def addEquipment():
+
+	#Clear the lists
+	eqBranch.clear()
+
+	#Create the list for the branch
+	cur = mysql.connection.cursor()
+	q = cur.execute("SELECT branch_Name from Branch")
+	b = cur.fetchall()
+	for i in range(q):
+	    eqBranch.append(b[i]['branch_Name'])
+	
+	form = AddEquipmentForm(request.form)
+	if request.method == 'POST':
+
+		#Get the data from the form
+		etype = request.form['etype']
+		branch = request.form['branch']
+		desc = request.form['desc']
+		datePur = request.form['datePur']
+
+		result = cur.execute('SELECT branch_No from Branch WHERE branch_Name = %s', [branch])
+		data = cur.fetchone()
+		bnum = data['branch_No']
+
+		#Update Equipment Table
+		sql = "INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES( '" +etype+ "', " +str(bnum)+", '" +desc+"', '"+datePur+"')"
+		cur.execute(sql)
+		mysql.connection.commit()
+		#flash(f"{sql}", 'success')
+	
+	return render_template("addEquipment.html", title='Add Equipments', form=form);	
 
 #if __name__ == "__main__":
 app.run(host="0.0.0.0", port=int("5000"), debug=True)

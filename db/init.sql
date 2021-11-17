@@ -127,3 +127,4 @@ CREATE TABLE Equipment(
     date_Purchased DATE,
     FOREIGN KEY (branch_No) REFERENCES Branch(branch_No)
 );
+
