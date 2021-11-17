@@ -237,7 +237,7 @@ def registration():
 		mysql.connection.commit()
 
 		#Update Customers Table
-		sql = "INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username) VALUES( '" +fname+ "', '" +lname+ "', " +str(age)+", '" +gender+"', '"+address+"', '"+city+"', '" +zipCode+"', " +str(mtypeId)+", '"+mtype+"', "+str(mfee)+", '"+username+"')"
+		sql = "INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username, branch_No) VALUES( '" +fname+ "', '" +lname+ "', " +str(age)+", '" +gender+"', '"+address+"', '"+city+"', '" +zipCode+"', " +str(mtypeId)+", '"+mtype+"', "+str(mfee)+", '"+username+"', 1)"
 		cur.execute(sql)
 		mysql.connection.commit()
 	
