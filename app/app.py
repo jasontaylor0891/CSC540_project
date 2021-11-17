@@ -237,7 +237,7 @@ def registration():
 		mysql.connection.commit()
 
 		#Update Customers Table
-		sql = "INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username, password) VALUES( '" +fname+ "', '" +lname+ "', " +str(age)+", '" +gender+"', '"+address+"', '"+city+"', '" +zipCode+"', " +str(mtypeId)+", '"+mtype+"', "+str(mfee)+", '"+username+"', '"+password+"')"
+		sql = "INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username) VALUES( '" +fname+ "', '" +lname+ "', " +str(age)+", '" +gender+"', '"+address+"', '"+city+"', '" +zipCode+"', " +str(mtypeId)+", '"+mtype+"', "+str(mfee)+", '"+username+"')"
 		cur.execute(sql)
 		mysql.connection.commit()
 	
@@ -247,6 +247,82 @@ def registration():
 		cur.close()
 
 	return render_template('registration.html', title='Register', form=form)
+
+empPosition = []
+epmBranch = []
+
+class AddMaddEmployee(Form):
+
+	#Class to define the Add Member Form
+    fname = StringField('First Name', [validators.Length(min=1, max=50), validators.InputRequired()])
+    lname = StringField('Last Name', [validators.Length(min=1, max=50), validators.InputRequired()])
+    username = StringField('Username', [validators.InputRequired(), validators.NoneOf(values = values, message = "Username is already taken")])
+    password = PasswordField('Password', [
+        validators.DataRequired(),
+        validators.EqualTo('confirm', message='Passwords do not match')])
+    confirm = PasswordField('Confirm Password')
+    salary = StringField('Salary', [validators.InputRequired()])
+    position = SelectField('Position', choices = empPosition)
+    branch = SelectField('Branch', choices = epmBranch)
+
+@app.route('/addEmployee', methods = ['GET', 'POST'])
+#@is_logged_in
+#@is_admin
+def addEmployee():
+
+	#Clear the lists
+	empPosition.clear()
+	epmBranch.clear()
+
+	#Create the list for the branch
+	cur = mysql.connection.cursor()
+	q = cur.execute("SELECT branch_Name from Branch")
+	b = cur.fetchall()
+	for i in range(q):
+	    epmBranch.append(b[i]['branch_Name'])
+	
+	#Create the list for the gender list
+	empPosition.append("Manager")
+	empPosition.append("Trainer")
+	empPosition.append("Receptionist")
+
+	form = AddMaddEmployee(request.form)
+	if request.method == 'POST':
+		
+		#Get the data from the form
+		username = request.form['username']
+		fname = request.form['fname']
+		lname = request.form['lname']
+		password = request.form['password']
+		salary = request.form['salary']
+		position = request.form['position']
+		branch = request.form['branch']
+		
+		#flash(f"{username}", 'success')
+		#Update logins table
+		hash = sha256_crypt.hash(password)
+		if position == "Manager":
+			sql = "INSERT INTO logins(username, password, profile) VALUES('" +username+ "', '" +hash+ "', 1)"
+		if position == "Trainer":
+			sql = "INSERT INTO logins(username, password, profile) VALUES('" +username+ "', '" +hash+ "', 3)"
+		if position == "Receptionist":
+				sql = "INSERT INTO logins(username, password, profile) VALUES('" +username+ "', '" +hash+ "', 2)"
+		
+		#flash(f"{sql}", 'success')
+		cur.execute(sql)
+		mysql.connection.commit()
+
+		result = cur.execute('SELECT branch_No from Branch WHERE branch_Name = %s', [branch])
+		data = cur.fetchone()
+		bnum = data['branch_No']
+
+		#Update Employees Table
+		sql = "INSERT INTO Employees(firstName, lastName, branch_No, position, salary, username) VALUES( '" +fname+ "', '" +lname+ "', " +str(bnum)+", '" +position+"', '"+str(salary)+"', '"+username+"')"
+		cur.execute(sql)
+		mysql.connection.commit()
+		#flash(f"{sql}", 'success')
+
+	return render_template("addEmployee.html", title='Add Employee', form=form); 
 
 #if __name__ == "__main__":
 app.run(host="0.0.0.0", port=int("5000"), debug=True)
