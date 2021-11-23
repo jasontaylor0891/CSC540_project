@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron" style="background-color:#F0F8FF;">
+	<h1 style="font-variant: small-caps;">Add New Branch</h1>
+    {% from "includes/_formhelpers.html" import render_field %}
+	<form action="" method="POST">
+		<div class="form-group">
+            {{render_field(form.bname, class_="form-control")}}
+          </div>
+          <div class="form-group">
+            {{render_field(form.address, class_="form-control")}}
+          </div>
+          <div class="form-group">
+            {{render_field(form.city, class_="form-control")}}
+          </div>
+          <div class="form-group">
+            {{render_field(form.zipCode, class_="form-control")}}
+          </div>
+          <div class="form-group">
+            {{render_field(form.phoneNum, class_="form-control")}}
+          </div>
+		<button type="submit" class="btn btn-primary">Add Branch</button>
+	</form> 
+	</div>
+{% endblock %}

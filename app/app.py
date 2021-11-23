@@ -19,7 +19,7 @@ app = Flask(__name__, template_folder='templates')
 app.secret_key = "welcome123"
 
 #Change mysql host if not using docker. Docker default is gym_managment_db_1
-app.config['MYSQL_HOST'] = 'csc540_project-db-1'
+app.config['MYSQL_HOST'] = 'csc540_project_db_1'
 app.config['MYSQL_USER'] = 'gym'
 app.config['MYSQL_PASSWORD'] = 'welcome123'
 app.config['MYSQL_DB'] = 'gym'
@@ -370,5 +370,41 @@ def addEquipment():
 	
 	return render_template("addEquipment.html", title='Add Equipments', form=form);	
 
-#if __name__ == "__main__":
+
+class AddBranchForm(Form):	
+
+	#Class to define the Add Equipment Form
+	bname = StringField('Branch Name', [validators.Length(min=1, max=50), validators.InputRequired()])
+	address = StringField('Address', [validators.Length(min=1, max=50), validators.InputRequired()])
+	city = StringField('City', [validators.Length(min=1, max=50), validators.InputRequired()])
+	zipCode = StringField('Zip Code', [validators.Length(min=1, max=50), validators.InputRequired()])
+	phoneNum = StringField('Phone Number', [validators.Length(min=1, max=50), validators.InputRequired()])
+
+
+@app.route('/addBranch', methods = ['GET', 'POST'])
+#@is_logged_in
+#@is_admin
+def addBranch():
+
+	
+	form = AddBranchForm(request.form)
+	if request.method == 'POST':
+
+		#Get the data from the form
+		bname = request.form['bname']
+		address = request.form['address']
+		city = request.form['city']
+		zipCode = request.form['zipCode']
+		phoneNum = request.form['phoneNum']
+
+		cur = mysql.connection.cursor()
+
+		#Update Equipment Table
+		sql = "INSERT INTO Branch(branch_Name, address, city, zipCode, phoneNum) VALUES( '" +bname+ "', '" +address+"', '" +city+"', '"+zipCode+"', '"+phoneNum+"')"
+		cur.execute(sql)
+		mysql.connection.commit()
+		#flash(f"{sql}", 'success')
+	
+	return render_template("addBranch.html", title='Add Branch', form=form);	
+
 app.run(host="0.0.0.0", port=int("5000"), debug=True)
