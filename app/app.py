@@ -385,7 +385,6 @@ class AddBranchForm(Form):
 #@is_logged_in
 #@is_admin
 def addBranch():
-
 	
 	form = AddBranchForm(request.form)
 	if request.method == 'POST':
@@ -406,5 +405,88 @@ def addBranch():
 		#flash(f"{sql}", 'success')
 	
 	return render_template("addBranch.html", title='Add Branch', form=form);	
+
+
+classType = []
+classTimes = []
+classbranch = []
+#classInstructor = []
+
+class AddClassForm(Form):	
+
+	#Class to define the Add Equipment Form
+	  
+	branch = SelectField('Branch', choices = classbranch)
+	#instructor = SelectField('Instructor', choices = classInstructor)
+	desc = TextAreaField('Description', [validators.Length(min=1, max=250), validators.InputRequired()])
+	ctype = SelectField('Class Type', choices = classType)
+	ctime = SelectField('Class Time', choices = classTimes)
+	cdate = DateField('Class Date', [validators.InputRequired()], format = '%m/%d/%Y')
+	cname = StringField('Class Name', [validators.Length(min=1, max=25), validators.InputRequired()])
+	slots = StringField('Available Slots', [validators.Length(min=1, max=2), validators.InputRequired()])
+
+
+@app.route('/addClass', methods = ['GET', 'POST'])
+#@is_logged_in
+#@is_admin
+def addClass():
+
+	classType.clear()
+	classTimes.clear()
+	classbranch.clear()
+
+	#Create the list for the branch
+	cur = mysql.connection.cursor()
+	q = cur.execute("SELECT branch_Name from Branch")
+	b = cur.fetchall()
+	for i in range(q):
+	    classbranch.append(b[i]['branch_Name'])
+
+	#Create the list for the Instructors
+	#cur = mysql.connection.cursor()
+	#q = cur.execute("SELECT branch_Name from Branch")
+	#b = cur.fetchall()
+	#for i in range(q):
+	#    classbranch.append(b[i]['branch_Name'])
+
+	#Create the list for class types
+	cur = mysql.connection.cursor()
+	q = cur.execute("SELECT class_Type from ClassTypes")
+	b = cur.fetchall()
+	for i in range(q):
+	    classType.append(b[i]['class_Type'])
+
+	#Create the list for class times
+	cur = mysql.connection.cursor()
+	q = cur.execute("SELECT class_Times from ClassTimes")
+	b = cur.fetchall()
+	for i in range(q):
+	    classTimes.append(b[i]['class_Times'])
+
+
+	form = AddClassForm(request.form)
+	if request.method == 'POST':
+
+		#Get the data from the form
+		cname = request.form['cname']
+		ctype = request.form['ctype']
+		tstart = request.form['ctime']
+		dstart = request.form['cdate']
+		slots = request.form['slots']
+		branch = request.form['branch']
+		desc = request.form['desc']
+		
+		cur = mysql.connection.cursor()
+		result = cur.execute('SELECT branch_No from Branch WHERE branch_Name = %s', [branch])
+		data = cur.fetchone()
+		branchNum = data['branch_No']
+
+		#Update Equipment Table
+		sql = "INSERT INTO Classes(instructor_ID, branch_No, class_name, class_type, class_desc, time_start, date_start, available_slots) VALUES( 1, " +str(branchNum)+", '" +cname+"', '" +ctype+"', '"+desc+"', '"+tstart+"', '"+dstart+"', "+slots+")"
+		cur.execute(sql)
+		mysql.connection.commit()
+		#flash(f"{sql}", 'success')
+	
+	return render_template("addClass.html", title='Add New Class', form=form);
 
 app.run(host="0.0.0.0", port=int("5000"), debug=True)
