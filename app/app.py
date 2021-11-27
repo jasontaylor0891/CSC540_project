@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, redirect, url_for, request, session, logging
+from flask import Flask, render_template, flash, redirect, url_for, request, session, logging, json, jsonify
 from flask_mysqldb import MySQL
 from passlib.hash import sha256_crypt
 from flask_wtf import FlaskForm
@@ -19,7 +19,7 @@ app = Flask(__name__, template_folder='templates')
 app.secret_key = "welcome123"
 
 #Change mysql host if not using docker. Docker default is gym_managment_db_1
-app.config['MYSQL_HOST'] = 'csc540_project_db_1'
+app.config['MYSQL_HOST'] = 'csc540_project-db-1'
 app.config['MYSQL_USER'] = 'gym'
 app.config['MYSQL_PASSWORD'] = 'welcome123'
 app.config['MYSQL_DB'] = 'gym'
@@ -373,7 +373,7 @@ def addEquipment():
 
 class AddBranchForm(Form):	
 
-	#Class to define the Add Equipment Form
+	#Class to define the Add Branch Form
 	bname = StringField('Branch Name', [validators.Length(min=1, max=50), validators.InputRequired()])
 	address = StringField('Address', [validators.Length(min=1, max=50), validators.InputRequired()])
 	city = StringField('City', [validators.Length(min=1, max=50), validators.InputRequired()])
@@ -398,7 +398,7 @@ def addBranch():
 
 		cur = mysql.connection.cursor()
 
-		#Update Equipment Table
+		#Update Branch Table
 		sql = "INSERT INTO Branch(branch_Name, address, city, zipCode, phoneNum) VALUES( '" +bname+ "', '" +address+"', '" +city+"', '"+zipCode+"', '"+phoneNum+"')"
 		cur.execute(sql)
 		mysql.connection.commit()
@@ -410,14 +410,14 @@ def addBranch():
 classType = []
 classTimes = []
 classbranch = []
-#classInstructor = []
+classInstructor = []
 
 class AddClassForm(Form):	
 
-	#Class to define the Add Equipment Form
+	#Class to define the Add Class Form
 	  
 	branch = SelectField('Branch', choices = classbranch)
-	#instructor = SelectField('Instructor', choices = classInstructor)
+	instructor = SelectField('Instructor', choices = classInstructor)
 	desc = TextAreaField('Description', [validators.Length(min=1, max=250), validators.InputRequired()])
 	ctype = SelectField('Class Type', choices = classType)
 	ctime = SelectField('Class Time', choices = classTimes)
@@ -434,6 +434,7 @@ def addClass():
 	classType.clear()
 	classTimes.clear()
 	classbranch.clear()
+	classInstructor.clear()
 
 	#Create the list for the branch
 	cur = mysql.connection.cursor()
@@ -443,11 +444,11 @@ def addClass():
 	    classbranch.append(b[i]['branch_Name'])
 
 	#Create the list for the Instructors
-	#cur = mysql.connection.cursor()
-	#q = cur.execute("SELECT branch_Name from Branch")
-	#b = cur.fetchall()
-	#for i in range(q):
-	#    classbranch.append(b[i]['branch_Name'])
+	cur = mysql.connection.cursor()
+	q = cur.execute("SELECT employee_ID from Employees WHERE position = 'Trainer' ")
+	b = cur.fetchall()
+	for i in range(q):
+	    classInstructor.append(b[i]['employee_ID'])
 
 	#Create the list for class types
 	cur = mysql.connection.cursor()
@@ -475,18 +476,24 @@ def addClass():
 		slots = request.form['slots']
 		branch = request.form['branch']
 		desc = request.form['desc']
+		instructor = request.form['instructor']
 		
 		cur = mysql.connection.cursor()
 		result = cur.execute('SELECT branch_No from Branch WHERE branch_Name = %s', [branch])
 		data = cur.fetchone()
 		branchNum = data['branch_No']
 
-		#Update Equipment Table
-		sql = "INSERT INTO Classes(instructor_ID, branch_No, class_name, class_type, class_desc, time_start, date_start, available_slots) VALUES( 1, " +str(branchNum)+", '" +cname+"', '" +ctype+"', '"+desc+"', '"+tstart+"', '"+dstart+"', "+slots+")"
+		cur = mysql.connection.cursor()
+		result = cur.execute('SELECT employee_ID from Employees WHERE employee_ID = %s', [instructor])
+		data = cur.fetchone()
+		empID = data['employee_ID']
+
+		#Update Classes Table
+		sql = "INSERT INTO Classes(instructor_ID, branch_No, class_name, class_type, class_desc, time_start, date_start, available_slots) VALUES( " +str(empID)+", " +str(branchNum)+", '" +cname+"', '" +ctype+"', '"+desc+"', '"+tstart+"', '"+dstart+"', "+slots+")"
 		cur.execute(sql)
 		mysql.connection.commit()
 		#flash(f"{sql}", 'success')
 	
-	return render_template("addClass.html", title='Add New Class', form=form);
+	return render_template("addClass.html", title='Add New Class', form=form);	
 
 app.run(host="0.0.0.0", port=int("5000"), debug=True)
