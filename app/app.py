@@ -698,4 +698,46 @@ def addClass():
 	
 	return render_template("addClass.html", title='Add New Class', form=form);
 
+@app.route('/viewMyClassesMember', methods = ['GET', 'POST'])
+@is_logged_in
+def viewMyClassesMember():
+
+
+	cur = mysql.connection.cursor()
+	sql = """SELECT equipment_type, description, date_Purchased, Branch_Name, address, city from Equipment 
+    NATURAL JOIN Branch;"""
+	cur.execute(sql)
+	
+	data = cur.fetchall()
+	#flash(f'{data}', 'success')
+	return render_template('viewMyClassesMember.html', data = data)
+
+@app.route('/viewMyAppMember', methods = ['GET', 'POST'])
+@is_logged_in
+def viewMyAppMember():
+
+	
+	cur = mysql.connection.cursor()
+	sql = """SELECT equipment_type, description, date_Purchased, Branch_Name, address, city from Equipment 
+    NATURAL JOIN Branch;"""
+	cur.execute(sql)
+	
+	data = cur.fetchall()
+	#flash(f'{data}', 'success')
+	return render_template('viewMyAppMember.html', data = data)
+
+@app.route('/registerForClasses', methods = ['GET', 'POST'])
+@is_logged_in
+def registerForClasses():
+
+	
+	cur = mysql.connection.cursor()
+	sql = """SELECT equipment_type, description, date_Purchased, Branch_Name, address, city from Equipment 
+    NATURAL JOIN Branch;"""
+	cur.execute(sql)
+	
+	data = cur.fetchall()
+	#flash(f'{data}', 'success')
+	return render_template('registerForClasses.html', data = data)
+
 app.run(host="0.0.0.0", port=int("5000"), debug=True)

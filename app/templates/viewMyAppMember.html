@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+
+
+
+{% block body %}
+<div class="jumbotron" style="background-color:#F0F8FF;">
+	<h1 style="font-variant: small-caps;">View My Classes:</h1>
+       <table border="1" cellpadding="5" cellspacing="5">
+            <tr>
+                <th>Class Name</th>
+                <th>Class Type</th>
+                <th>Start Date</th>
+                <th>Start Time</th>
+            </tr>
+            
+                {% for item in data %}
+                
+                <tr>
+                    <td>{{item['class_name']}}</td>
+                    <td>{{item['class_type']}}</td>
+                    <td>{{item['date_start']}}</td>
+                    <td>{{item['time_start']}}</td>
+                </tr>
+                {% endfor %}
+            
+       </table>
+	</div>
+{% endblock %}

@@ -4,7 +4,15 @@
   <div class="text-white">
 	<h1 style="font-family: Georgia, serif;">Member Dashboard</h1>
   <div class="font-italic">
-  
+    <div class="form-group">
+			<a href = "{{url_for('viewMyClassesMember')}}"><button type ="button" class="btn btn-outline-info btn-lg" >View My Classes</button></a>
+		</div>
+    <div class="form-group">
+			<a href = "{{url_for('viewMyAppMember')}}"><button type ="button" class="btn btn-outline-info btn-lg" >View My Appointments</button></a>
+		</div>
+    <div class="form-group">
+			<a href = "{{url_for('registerForClasses')}}"><button type ="button" class="btn btn-outline-info btn-lg" >Register for Classes</button></a>
+		</div>
 </div>
 </div>
 {% endblock %}
