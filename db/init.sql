@@ -50,7 +50,7 @@ INSERT INTO Branch(branch_Name, address, city, zipCode, phoneNum)
 VALUES 
 ('Power Fitness New Haven', '142 Church St', 'New Haven', '06501', '203-555-1234'),
 ('Power Fitness Milford', '1258 Boston Post Rd', 'Milford', '06460', '203-555-1234'),
-('Power Fitness Stamford', '142 Church St', 'Stamford', '06901', '203-555-1234');
+('Power Fitness Stamford', '888 Main St', 'Stamford', '06901', '203-555-1234');
 
 CREATE TABLE Customers(
     customer_ID INT PRIMARY KEY AUTO_INCREMENT,
@@ -99,7 +99,7 @@ CREATE TABLE Classes(
     time_start TIME,
     date_start DATE,
     available_slots INT,
-    FOREIGN KEY (instructor_ID) REFERENCES Employees(employee_ID),
+    FOREIGN KEY (instructor_ID) REFERENCES Employees(employee_ID) ON DELETE SET NULL,
     FOREIGN KEY (branch_No) REFERENCES Branch(branch_No)
 );
 

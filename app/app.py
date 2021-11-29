@@ -251,7 +251,7 @@ def registration():
 empPosition = []
 epmBranch = []
 
-class AddMaddEmployee(Form):
+class addEmployeeForm(Form):
 
 	#Class to define the Add Member Form
     fname = StringField('First Name', [validators.Length(min=1, max=50), validators.InputRequired()])
@@ -266,8 +266,8 @@ class AddMaddEmployee(Form):
     branch = SelectField('Branch', choices = epmBranch)
 
 @app.route('/addEmployee', methods = ['GET', 'POST'])
-#@is_logged_in
-#@is_admin
+@is_logged_in
+@is_admin
 def addEmployee():
 
 	#Clear the lists
@@ -286,7 +286,7 @@ def addEmployee():
 	empPosition.append("Trainer")
 	empPosition.append("Receptionist")
 
-	form = AddMaddEmployee(request.form)
+	form = addEmployeeForm(request.form)
 	if request.method == 'POST':
 		
 		#Get the data from the form
@@ -321,8 +321,48 @@ def addEmployee():
 		cur.execute(sql)
 		mysql.connection.commit()
 		#flash(f"{sql}", 'success')
+		flash(f'You created a new employee {username}!!', 'success')
+		return redirect(url_for('adminDashboard'))
+		
 
 	return render_template("addEmployee.html", title='Add Employee', form=form);	
+
+delEmp = []
+
+class DeleteEmployeeForm(Form):
+	username = SelectField(u'Choose Employee to delete', choices=delEmp)
+
+@app.route('/DeleteEmployee', methods = ['GET', 'POST'])
+@is_logged_in
+@is_admin
+def DeleteEmployee():
+	delEmp.clear()
+	cur = mysql.connection.cursor()
+	q = cur.execute("SELECT username FROM Employees")
+	b = cur.fetchall()
+
+	for i in range(q):
+		tup = (b[i]['username'],b[i]['username'])
+		delEmp.append(tup)
+
+	form = DeleteEmployeeForm(request.form)
+	if len(delEmp)==1:
+		flash('You cannot remove your only Employee!!', 'danger')
+		return redirect(url_for('adminDashboard'))
+	
+	if request.method == 'POST':
+		username = form.username.data
+		
+		cur.execute("DELETE FROM Employees WHERE username = %s", [username])
+		cur.execute("DELETE FROM logins WHERE username = %s", [username])
+		
+		mysql.connection.commit()
+		cur.close()
+		delEmp.clear()
+		flash(f'You removed your employee {username}!!', 'success')
+		return redirect(url_for('adminDashboard'))
+
+	return render_template('DeleteEmployee.html', form = form)
 
 eqBranch = []	
 
@@ -335,8 +375,8 @@ class AddEquipmentForm(Form):
     branch = SelectField('Branch', choices = eqBranch) 
 
 @app.route('/addEquipment', methods = ['GET', 'POST'])
-#@is_logged_in
-#@is_admin
+@is_logged_in
+@is_admin
 def addEquipment():
 
 	#Clear the lists
@@ -367,9 +407,53 @@ def addEquipment():
 		cur.execute(sql)
 		mysql.connection.commit()
 		#flash(f"{sql}", 'success')
+		flash(f'You added new equipment to the {branch} branch!!', 'success')
+		return redirect(url_for('adminDashboard'))
 	
 	return render_template("addEquipment.html", title='Add Equipments', form=form);	
 
+delEqu = []
+
+class DeleteEquipmentForm(Form):
+	equipment = SelectField(u'Choose Equipment to delete', choices=delEqu)
+
+@app.route('/DeleteEquipment', methods = ['GET', 'POST'])
+@is_logged_in
+@is_admin
+def DeleteEquipment():
+	delEqu.clear()
+	cur = mysql.connection.cursor()
+	q = cur.execute("SELECT equipment_Type FROM Equipment")
+	b = cur.fetchall()
+
+	for i in range(q):
+	    delEqu.append(b[i]['equipment_Type'])
+
+	form = DeleteEquipmentForm(request.form)
+	
+	if request.method == 'POST':
+		equipment = form.equipment.data
+		
+		cur.execute("DELETE FROM Equipment WHERE equipment_Type = %s", [equipment])
+		
+		mysql.connection.commit()
+		cur.close()
+		delEmp.clear()
+		flash(f'You removed your Equipment!!', 'success')
+		return redirect(url_for('adminDashboard'))
+
+	return render_template('DeleteEquipment.html', form = form)
+
+@app.route('/viewEquipmentReport', methods = ['GET', 'POST'])
+@is_logged_in
+@is_admin
+def viewEquipmentReport():
+
+	cur = mysql.connection.cursor()
+	cur.execute("SELECT equipment_type, description, date_Purchased, Branch_Name, address, city from Equipment NATURAL JOIN Branch;")
+	data = cur.fetchall()
+	#flash(f'{data}', 'success')
+	return render_template('viewEquipmentReport.html', data = data)
 
 class AddBranchForm(Form):	
 
@@ -382,8 +466,8 @@ class AddBranchForm(Form):
 
 
 @app.route('/addBranch', methods = ['GET', 'POST'])
-#@is_logged_in
-#@is_admin
+@is_logged_in
+@is_admin
 def addBranch():
 	
 	form = AddBranchForm(request.form)
@@ -403,6 +487,8 @@ def addBranch():
 		cur.execute(sql)
 		mysql.connection.commit()
 		#flash(f"{sql}", 'success')
+		flash(f'You created a new branch!!', 'success')
+		return redirect(url_for('adminDashboard'))
 	
 	return render_template("addBranch.html", title='Add Branch', form=form);	
 
@@ -410,14 +496,14 @@ def addBranch():
 classType = []
 classTimes = []
 classbranch = []
-#classInstructor = []
+classInstructor = []
 
 class AddClassForm(Form):	
 
 	#Class to define the Add Equipment Form
 	  
 	branch = SelectField('Branch', choices = classbranch)
-	#instructor = SelectField('Instructor', choices = classInstructor)
+	instructor = SelectField('Instructor', choices = classInstructor)
 	desc = TextAreaField('Description', [validators.Length(min=1, max=250), validators.InputRequired()])
 	ctype = SelectField('Class Type', choices = classType)
 	ctime = SelectField('Class Time', choices = classTimes)
@@ -427,13 +513,14 @@ class AddClassForm(Form):
 
 
 @app.route('/addClass', methods = ['GET', 'POST'])
-#@is_logged_in
-#@is_admin
+@is_logged_in
+@is_admin
 def addClass():
 
 	classType.clear()
 	classTimes.clear()
 	classbranch.clear()
+	classInstructor.clear()
 
 	#Create the list for the branch
 	cur = mysql.connection.cursor()
@@ -443,11 +530,11 @@ def addClass():
 	    classbranch.append(b[i]['branch_Name'])
 
 	#Create the list for the Instructors
-	#cur = mysql.connection.cursor()
-	#q = cur.execute("SELECT branch_Name from Branch")
-	#b = cur.fetchall()
-	#for i in range(q):
-	#    classbranch.append(b[i]['branch_Name'])
+	cur = mysql.connection.cursor()
+	q = cur.execute("SELECT username from Employees WHERE position = 'Trainer' ")
+	b = cur.fetchall()
+	for i in range(q):
+	    classInstructor.append(b[i]['username'])
 
 	#Create the list for class types
 	cur = mysql.connection.cursor()
@@ -475,7 +562,8 @@ def addClass():
 		slots = request.form['slots']
 		branch = request.form['branch']
 		desc = request.form['desc']
-		
+		instructor = request.form['instructor']
+
 		cur = mysql.connection.cursor()
 		result = cur.execute('SELECT branch_No from Branch WHERE branch_Name = %s', [branch])
 		data = cur.fetchone()
@@ -486,6 +574,8 @@ def addClass():
 		cur.execute(sql)
 		mysql.connection.commit()
 		#flash(f"{sql}", 'success')
+		flash(f'You created a new class at the {branch} branch!!', 'success')
+		return redirect(url_for('adminDashboard'))
 	
 	return render_template("addClass.html", title='Add New Class', form=form);
 

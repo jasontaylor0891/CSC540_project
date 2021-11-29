@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+
+
+{% block body %}
+<div class="jumbotron" style="background-color:#F0F8FF;">
+	<h1 style="font-variant: small-caps;">View Equipment Report:</h1>
+       <table border="1" cellpadding="5" cellspacing="5">
+            <tr>
+                <th>Equipment</th>
+                <th>Description</th>
+                <th>Date Purchased</th>
+                <th>Branch Name</th>
+                <th>Branch Address</th>
+                <th>Branch City</th>
+            </tr>
+            
+                {% for item in data %}
+                
+                <tr>
+                    <td>{{item['equipment_type']}}</td>
+                    <td>{{item['description']}}</td>
+                    <td>{{item['date_Purchased']}}</td>
+                    <td>{{item['Branch_Name']}}</td>
+                    <td>{{item['address']}}</td>
+                    <td>{{item['city']}}</td>
+                </tr>
+                {% endfor %}
+            
+       </table>
+	</div>
+{% endblock %}
