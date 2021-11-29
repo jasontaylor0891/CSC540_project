@@ -4,7 +4,12 @@
   <div class="text-white">
 	<h1 style="font-family: Georgia, serif;">Receptionist Dashboard</h1>
   <div class="font-italic">
-  
+    <div class="form-group">
+			<a href = "{{url_for('registration')}}"><button type ="button" class="btn btn-outline-info btn-lg" >Register New Member</button></a>
+		</div>
+    <div class="form-group">
+			<a href = "{{url_for('viewMemberReport')}}"><button type ="button" class="btn btn-outline-info btn-lg" >View Member Report</button></a>
+		</div>
 </div>
 </div>
 {% endblock %}

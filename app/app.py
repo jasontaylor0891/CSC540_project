@@ -38,6 +38,21 @@ def is_logged_in(f):
 			return redirect(url_for('login'))
 	return wrap
 
+#function to determin if the logged in user is a employee.
+def is_employee(f):
+	@wraps(f)
+	def wrap(*args, **kwargs):
+		if session['profile'] == 3:
+			return f(*args, **kwargs)
+		elif session['profile'] == 1:
+			return f(*args, **kwargs)
+		elif session['profile'] <= 2:
+			return f(*args, **kwargs)
+		else:
+			flash('You are not a employee!!, You do not have access to this page.', 'danger')
+			return redirect(url_for('login'))
+	return wrap
+
 #function to determin if the logged in user is a trainer.
 def is_trainer(f):
 	@wraps(f)
@@ -446,7 +461,7 @@ def DeleteEquipment():
 
 @app.route('/viewEquipmentReport', methods = ['GET', 'POST'])
 @is_logged_in
-@is_admin
+@is_employee
 def viewEquipmentReport():
 
 	cur = mysql.connection.cursor()
@@ -454,6 +469,36 @@ def viewEquipmentReport():
 	data = cur.fetchall()
 	#flash(f'{data}', 'success')
 	return render_template('viewEquipmentReport.html', data = data)
+
+@app.route('/viewMemberReport', methods = ['GET', 'POST'])
+@is_logged_in
+@is_employee
+def viewMemberReport():
+
+	cur = mysql.connection.cursor()
+	sql = """SELECT Customers.firstName, Customers.lastName, Customers.age, Customers.gender, Customers.Address, Customers.city, Customers.zipCode, Customers.membership_type, Branch.branch_Name FROM Customers
+     INNER JOIN Branch
+     ON Customers.branch_No = Branch.branch_No;"""
+
+	cur.execute(sql) 
+	data = cur.fetchall()
+	#flash(f'{data}', 'success')
+	return render_template('viewMemberReport.html', data = data)
+
+@app.route('/viewEmployeeReport', methods = ['GET', 'POST'])
+@is_logged_in
+@is_employee
+def viewEmployeeReport():
+
+	cur = mysql.connection.cursor()
+	sql = """SELECT Employees.firstName, Employees.lastName, Employees.position, Employees.salary, Branch.branch_Name FROM Employees
+     INNER JOIN Branch
+     ON Employees.branch_No = Branch.branch_No;"""
+
+	cur.execute(sql) 
+	data = cur.fetchall()
+	#flash(f'{data}', 'success')
+	return render_template('viewEmployeeReport.html', data = data)
 
 class AddBranchForm(Form):	
 
