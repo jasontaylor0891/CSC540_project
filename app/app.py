@@ -131,30 +131,70 @@ def login():
 
     return render_template('login.html')
 
-    
+#Form for changing user password
+class ChangePasswordForm(Form):
+	old_password = PasswordField('Existing Password')
+	new_password = PasswordField('Password', [
+		validators.DataRequired(),
+		validators.EqualTo('confirm', message = 'Passwords do not match!')
+	])
+	confirm = PasswordField('Confirm Password')
+
+#Route and function for changing user password
+@app.route('/update_password/<string:username>', methods = ['GET', 'POST'])
+def update_password(username):
+	
+	form = ChangePasswordForm(request.form)
+	if request.method == 'POST' and form.validate():
+		new = form.new_password.data
+		entered = form.old_password.data
+
+		#getting current password from the database
+		cur = mysql.connection.cursor()
+		cur.execute("SELECT password FROM logins WHERE username = %s", [username])
+		old = (cur.fetchone())['password']
+
+		#IF the old password entered matches the db then update db with the new password
+		if sha256_crypt.verify(entered, old):
+			cur.execute("UPDATE logins SET password = %s WHERE username = %s", (sha256_crypt.encrypt(new), username))
+			mysql.connection.commit()
+			cur.close()
+			flash('New password will be in effect from next login!!', 'info')
+			return redirect(url_for('memberDashboard', username = session['username']))
+		
+		cur.close()
+		flash('Old password you entered is not correct!!, try again', 'warning')
+
+	return render_template('updatePassword.html', form = form)
+
+#Route and Function for adminDashboard
 @app.route('/adminDashboard')
 @is_logged_in
 @is_admin
 def adminDashboard():
     return render_template("adminDashboard.html"); 
 
+#Route and Function for trainerDashboard
 @app.route('/trainerDashboard')
 @is_logged_in
 @is_trainer
 def trainerDashboard():
     return render_template("trainerDashboard.html"); 
 
+#Route and Function for receptionistDashboard
 @app.route('/receptionistDashboard')
 @is_logged_in
 @is_recep_level
 def receptionistDashboard():
     return render_template("receptionistDashboard.html"); 
 
+#Route and Function for memberDashboard
 @app.route('/memberDashboard/<string:username>')
 @is_logged_in
 def memberDashboard(username):
     return render_template('memberDashboard.html')
 
+#Route and Function for logout function
 @app.route('/logout')
 @is_logged_in
 def logout():
@@ -162,6 +202,7 @@ def logout():
 	flash('You are now logged out', 'success')
 	return redirect(url_for('login'))
 
+#List and addMember form for member registration
 userAge = []
 userGender = []
 menberType = []
@@ -184,6 +225,7 @@ class AddMemberForm(Form):
     gender = SelectField('Gender', choices = userGender)
     mtype = SelectField('Membership Type', choices = menberType)
 
+#Route and function for member registration.
 @app.route('/registration', methods = ['GET', 'POST'])
 #@is_logged_in
 def registration():
@@ -280,6 +322,7 @@ class addEmployeeForm(Form):
     position = SelectField('Position', choices = empPosition)
     branch = SelectField('Branch', choices = epmBranch)
 
+#Route and function for addEmployee
 @app.route('/addEmployee', methods = ['GET', 'POST'])
 @is_logged_in
 @is_admin
@@ -459,13 +502,33 @@ def DeleteEquipment():
 
 	return render_template('DeleteEquipment.html', form = form)
 
+@app.route('/viewMyClasses', methods = ['GET', 'POST'])
+@is_logged_in
+@is_employee
+def viewMyClasses():
+
+	cur = mysql.connection.cursor()
+	sql = """SELECT class_name, class_type, date_start, time_start FROM Classes
+    ORDER BY date_start;"""
+	cur.execute(sql)
+	
+	#cur.execute("SELECT equipment_type, description, date_Purchased, Branch_Name, address, city from Equipment NATURAL JOIN Branch;")
+	data = cur.fetchall()
+	#flash(f'{data}', 'success')
+	return render_template('viewMyClasses.html', data = data)
+
+
 @app.route('/viewEquipmentReport', methods = ['GET', 'POST'])
 @is_logged_in
 @is_employee
 def viewEquipmentReport():
 
 	cur = mysql.connection.cursor()
-	cur.execute("SELECT equipment_type, description, date_Purchased, Branch_Name, address, city from Equipment NATURAL JOIN Branch;")
+	sql = """SELECT equipment_type, description, date_Purchased, Branch_Name, address, city from Equipment 
+    NATURAL JOIN Branch;"""
+	cur.execute(sql)
+	
+	#cur.execute("SELECT equipment_type, description, date_Purchased, Branch_Name, address, city from Equipment NATURAL JOIN Branch;")
 	data = cur.fetchall()
 	#flash(f'{data}', 'success')
 	return render_template('viewEquipmentReport.html', data = data)
@@ -476,10 +539,16 @@ def viewEquipmentReport():
 def viewMemberReport():
 
 	cur = mysql.connection.cursor()
-	sql = """SELECT Customers.firstName, Customers.lastName, Customers.age, Customers.gender, Customers.Address, Customers.city, Customers.zipCode, Customers.membership_type, Branch.branch_Name FROM Customers
+	#sql = """SELECT Customers.firstName, Customers.lastName, Customers.age, Customers.gender, Customers.Address, Customers.city, Customers.zipCode, Customers.membership_type, Branch.branch_Name FROM Customers
+    # INNER JOIN Branch
+    # ON Customers.branch_No = Branch.branch_No;"""
+
+	sql = """SELECT DISTINCT Customers.firstName, Customers.lastName, Customers.age, 
+    Customers.gender, Customers.Address, Customers.city, Customers.zipCode, 
+    Customers.membership_type, Branch.branch_Name FROM Customers
      INNER JOIN Branch
      ON Customers.branch_No = Branch.branch_No;"""
-
+	
 	cur.execute(sql) 
 	data = cur.fetchall()
 	#flash(f'{data}', 'success')
@@ -491,7 +560,12 @@ def viewMemberReport():
 def viewEmployeeReport():
 
 	cur = mysql.connection.cursor()
-	sql = """SELECT Employees.firstName, Employees.lastName, Employees.position, Employees.salary, Branch.branch_Name FROM Employees
+	#sql = """SELECT Employees.firstName, Employees.lastName, Employees.position, Employees.salary, Branch.branch_Name FROM Employees
+    # INNER JOIN Branch
+    # ON Employees.branch_No = Branch.branch_No;"""
+
+	sql = """SELECT Employees.firstName, Employees.lastName, Employees.position, 
+    Employees.salary, Branch.branch_Name FROM Employees
      INNER JOIN Branch
      ON Employees.branch_No = Branch.branch_No;"""
 
