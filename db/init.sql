@@ -33,7 +33,11 @@ VALUES
 ('eorenstein', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 3),
 ('jkelly', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 2),
 ('jillt', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 4),
-('billw', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 4);
+('billw', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 4),
+('jakew', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 4),
+('katek', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 4),
+('ctaylor', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 4),
+('kimt', '$5$rounds=535000$t6Y73jKPWxeNh9Ru$teQmHgaGdlo6U/xUzdYoK414w9P7Uhyu2b5GIA1tGv1', 4);
 
 
 
@@ -71,6 +75,9 @@ CREATE TABLE Customers(
 );
 INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username, branch_No) VALUES( 'Jill', 'Taylor', 32, 'Female', '21 Chidsey Dr', 'Northford', '06471', 1, 'Platinum', 99.95, 'jillt', 1);
 INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username, branch_No) VALUES( 'Bill', 'West', 28, 'Male', '883 Elm St', 'New Haven', '06501', 1, 'Platinum', 99.95, 'billw', 3);
+INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username, branch_No) VALUES( 'Jake', 'Wall', 45, 'Male', '182 Ridge St', 'Stanford', '06901', 1, 'Gold', 49.95, 'jakew', 1);
+INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username, branch_No) VALUES( 'Kate', 'Kyle', 38, 'Female', '192 Church St', 'New Haven', '06501', 1, 'Gold', 49.95, 'katek', 1);
+INSERT INTO Customers(firstName, lastName, age, gender, Address, city, zipCode, membership_ID, membership_type, fee, username, branch_No) VALUES( 'Kim', 'Tyler', 18, 'Female', '1209 State St', 'New Haven', '06501', 1, 'Sliver', 25.00, 'kimt', 1);
 
 CREATE TABLE Employees(
     employee_ID INT PRIMARY KEY AUTO_INCREMENT,
@@ -87,7 +94,8 @@ CREATE TABLE Employees(
 INSERT INTO Employees(firstName, lastName, branch_No, position, salary, username) VALUES( 'Jake', 'Mosher', 1, 'Manager', '89000', 'jmosher');
 INSERT INTO Employees(firstName, lastName, branch_No, position, salary, username) VALUES( 'emily', 'hope', 1, 'Trainer', '48500', 'ehope');
 INSERT INTO Employees(firstName, lastName, branch_No, position, salary, username) VALUES( 'Ella', 'Orenstein', 1, 'Trainer', '45000', 'eorenstein');
-INSERT INTO Employees(firstName, lastName, branch_No, position, salary, username) VALUES( 'John', 'Kelly', 1, 'Receptionist', '43000', 'jkelly');
+INSERT INTO Employees(firstName, lastName, branch_No, position, salary, username) VALUES( 'John', 'Kelly', 1, 'Receptionist', '36500', 'jkelly');
+INSERT INTO Employees(firstName, lastName, branch_No, position, salary, username) VALUES( 'Cindy', 'Taylor', 1, 'Receptionist', '38000', 'ctaylor');
 
 CREATE TABLE Classes(
     class_ID INT PRIMARY KEY AUTO_INCREMENT,
@@ -165,10 +173,30 @@ CREATE TABLE Equipment(
     equipment_ID INT PRIMARY KEY AUTO_INCREMENT,
     equipment_Type VARCHAR(50),
     branch_No INT,
-    description VARCHAR(50),
+    description VARCHAR(250),
     date_Purchased DATE,
     FOREIGN KEY (branch_No) REFERENCES Branch(branch_No)
 );
+
+INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES('NordicTrack EXP 7i Treadmill', 1, 'Bluetooth compatible audio with dual 2-inch speakers, Smart HD touchscreen', '2021-10-30');
+INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES('NordicTrack EXP 7i Treadmill', 2, 'Bluetooth compatible audio with dual 2-inch speakers, Smart HD touchscreen', '2021-10-30');
+INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES('NordicTrack EXP 7i Treadmill', 3, 'Bluetooth compatible audio with dual 2-inch speakers, Smart HD touchscreen', '2021-10-30');
+
+INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES('NordicTrack Commercial 14.9 Elliptical', 1, 'Bluetooth compatible audio with dual 2-inch speakers, Smart HD touchscreen', '2021-10-30');
+INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES('NordicTrack Commercial 14.9 Elliptical', 2, 'Bluetooth compatible audio with dual 2-inch speakers, Smart HD touchscreen', '2021-10-30');
+INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES('NordicTrack Commercial 14.9 Elliptical', 3, 'Bluetooth compatible audio with dual 2-inch speakers, Smart HD touchscreen', '2021-10-30');
+
+INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES('Bowflex M6 Max Trainer', 1, 'The Bowflex M6 Max Trainer machine offers an attractive way to get the benefits of the JRNY App at an affordable price.', '2021-10-15');
+INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES('Bowflex M6 Max Trainer', 2, 'The Bowflex M6 Max Trainer machine offers an attractive way to get the benefits of the JRNY App at an affordable price.', '2021-10-15');
+INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES('Bowflex M6 Max Trainer', 3, 'The Bowflex  M6 Max Trainer machine offers an attractive way to get the benefits of the JRNY App at an affordable price.', '2021-10-15');
+
+INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES('NordicTrack S22i Studio Cycle', 1, 'The NordicTrack S22i Studio Cycle is revolutionizing the home gym cycling experience.', '2021-10-15');
+INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES('NordicTrack S22i Studio Cycle', 2, 'The NordicTrack S22i Studio Cycle is revolutionizing the home gym cycling experience.', '2021-10-15');
+INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES('NordicTrack S22i Studio Cycle', 3, 'The NordicTrack S22i Studio Cycle is revolutionizing the home gym cycling experience.', '2021-10-15');
+
+INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES('NordicTrack RW600 Rower', 1, 'NordicTrack RW600 Rower', '2021-10-30');
+INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES('NordicTrack RW600 Rower', 2, 'NordicTrack RW600 Rower', '2021-10-30');
+INSERT INTO Equipment(equipment_Type, branch_No, description, date_Purchased) VALUES('NordicTrack RW600 Rower', 3, 'NordicTrack RW600 Rower', '2021-10-30');
 
 CREATE TABLE ClassTypes(
     class_Type VARCHAR(25) PRIMARY KEY
