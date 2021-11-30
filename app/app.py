@@ -543,7 +543,7 @@ def viewMemberReport():
     # INNER JOIN Branch
     # ON Customers.branch_No = Branch.branch_No;"""
 
-	sql = """SELECT DISTINCT Customers.firstName, Customers.lastName, Customers.age, 
+	sql = """SELECT Customers.firstName, Customers.lastName, Customers.age, 
     Customers.gender, Customers.Address, Customers.city, Customers.zipCode, 
     Customers.membership_type, Branch.branch_Name FROM Customers
      INNER JOIN Branch
