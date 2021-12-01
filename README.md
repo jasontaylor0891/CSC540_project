@@ -29,3 +29,5 @@ docker exec -it CHANGE_TO_YOUR_DB_NAME_db_1 mysql -ugym -p
 Password for the gym user is in the project report.
 
 This will provide command line access to the MYSQL database.
+
+Access the web application use the url: http://localhost:5000/
