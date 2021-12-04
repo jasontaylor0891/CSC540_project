@@ -496,7 +496,7 @@ def DeleteEquipment():
 		
 		mysql.connection.commit()
 		cur.close()
-		delEmp.clear()
+		delEqu.clear()
 		flash(f'You removed your Equipment!!', 'success')
 		return redirect(url_for('adminDashboard'))
 
