@@ -1,24 +1,33 @@
-If using docker after installing docker desktop downoad code and run from application folder.
+How to run project:
+
+Download and install Docker desktop.
+https://www.docker.com/products/docker-desktop
+
+Clone project from github.
+
+git clone https://github.com/jasontaylor0891/CSC540_project.git
+
+Change to the project directoty and run. (this is the folder where docker-compose.yml is located)
 
 docker-compose up --build
 
-to access the mssql on the mysql docker use:
+Verify the database created on your computer is the same as in app.py
 
-docker exec -it gym_managment_db_1 mysql -ugym -p
+Run:
+  docker ps 
 
-you will be prompted for the gym users password.  Once entered you can run sql commands against the mysql database.
+Review the name for the database container.  If you need to change the database name in the application stop the application in docker desktop or from the command window hit Control-C a few times.  You may need to delete the application in docker.
 
+You should see something similar to csc540_project_db_1.  If you have something different you will need to update the database host in app/app.py (Line 22).
 
-If you are not going to use docker you can use the instructions in https://flask.palletsprojects.com/en/2.0.x/installation/ to setup your dev env.
+app.config['MYSQL_HOST'] = 'CHANGE_TO_YOUR_DB_NAME_db_1'
 
-Once you install mysql run the init.sql in the db folder to create the database.
+To access the mssql on the mysql docker use:
 
-go to the folder the application is and run
+docker exec -it CHANGE_TO_YOUR_DB_NAME_db_1 mysql -ugym -p
 
-python3 app.py
+Password for the gym user is in the project report.
 
-I did not get this to work because I had issues installing the mysql module on my laptop.  
+This will provide command line access to the MYSQL database.
 
-This should work if you can install all the modules in requirements.txt
-
-in app.py line 16 you should change the database hostname to localhost.
+Access the web application use the url: http://localhost:5000/
