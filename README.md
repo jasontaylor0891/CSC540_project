@@ -1,33 +1,36 @@
-How to run project:
+# Class Project for CSC540 - Gym Management System
 
-Download and install Docker desktop.
-https://www.docker.com/products/docker-desktop
+Class project for CSC540 Database Systems.
 
-Clone project from github.
 
-git clone https://github.com/jasontaylor0891/CSC540_project.git
+## Authors
 
-Change to the project directoty and run. (this is the folder where docker-compose.yml is located)
+- [@jasontaylor0891](https://www.github.com/jasontaylor0891)
+- [@awuahn1](https://www.github.com/awuahn1)
 
-docker-compose up --build
 
-Verify the database created on your computer is the same as in app.py
+## Installation
 
-Run:
-  docker ps 
+Install project
 
-Review the name for the database container.  If you need to change the database name in the application stop the application in docker desktop or from the command window hit Control-C a few times.  You may need to delete the application in docker.
+```bash
+  git clone -b <branch_name> https://github.com/jasontaylor0891/CSC540_project.git
+  cd CSC540_project
+```
+    
+## Deployment
 
-You should see something similar to csc540_project_db_1.  If you have something different you will need to update the database host in app/app.py (Line 22).
+To deploy this project run:
 
-app.config['MYSQL_HOST'] = 'CHANGE_TO_YOUR_DB_NAME_db_1'
+```bash
+  docker-compose up --build
+```
 
-To access the mssql on the mysql docker use:
+## Local Database Access
 
-docker exec -it CHANGE_TO_YOUR_DB_NAME_db_1 mysql -ugym -p
+```bash
+  docker exec -it csc540_project_db_1 mysql -ucsc535 -p
+```
+## Website Access
 
-Password for the gym user is in the project report.
-
-This will provide command line access to the MYSQL database.
-
-Access the web application use the url: http://localhost:5000/
+http://localhost:8000/
